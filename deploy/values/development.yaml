@@ -1,0 +1,8 @@
+replicaCount: 1
+
+image:
+  pullPolicy: Never  # use locally built image
+
+config:
+  environment: development
+  debug: "true"

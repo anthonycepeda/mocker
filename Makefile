@@ -1,6 +1,9 @@
-IMAGE   := mocker:$(shell git rev-parse --short HEAD)
+COMMIT_SHA  := $(shell git rev-parse --short HEAD)
+IMAGE       := mocker:$(COMMIT_SHA)
 
-.PHONY: install format lint test run run-reload docker-build docker-run
+.PHONY: install format lint test run run-reload \
+        docker-build docker-run \
+        helm-dev helm-staging helm-production helm-diff helm-destroy
 
 install:
 	uv sync
@@ -27,3 +30,18 @@ docker-build:
 
 docker-run:
 	docker run --rm -p 8080:8080 $(IMAGE)
+
+helm-dev:
+	COMMIT_SHA=$(COMMIT_SHA) helmfile --file deploy/helmfile.yaml --environment development apply
+
+helm-staging:
+	COMMIT_SHA=$(COMMIT_SHA) helmfile --file deploy/helmfile.yaml --environment staging apply
+
+helm-production:
+	COMMIT_SHA=$(COMMIT_SHA) helmfile --file deploy/helmfile.yaml --environment production apply
+
+helm-diff:
+	COMMIT_SHA=$(COMMIT_SHA) helmfile --file deploy/helmfile.yaml --environment $(ENV) diff
+
+helm-destroy:
+	helmfile --file deploy/helmfile.yaml --environment $(ENV) destroy

@@ -1,0 +1,20 @@
+environments:
+  development:
+    values:
+      - values/development.yaml
+  staging:
+    values:
+      - values/staging.yaml
+  production:
+    values:
+      - values/production.yaml
+
+releases:
+  - name: mocker
+    chart: ./mocker
+    values:
+      - values/common.yaml
+      - values/{{ .Environment.Name }}.yaml
+    set:
+      - name: image.tag
+        value: {{ env "COMMIT_SHA" | default "latest" }}
