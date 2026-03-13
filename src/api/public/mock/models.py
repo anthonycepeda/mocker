@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class MockRequest(BaseModel):
-    """Request body for the POST /mock endpoint.
+    """Request body for the POST /mock/schema endpoint.
 
     Provide either `schema_url` or `app_name` (not both required).
     If both are given, `schema_url` takes precedence.
@@ -12,6 +12,7 @@ class MockRequest(BaseModel):
         json_schema_extra={
             "example": {
                 "app_name": "service-registry",
+                "schema_url": "http://service-registry/openapi.json",
                 "endpoint": "/services/{id}",
                 "method": "GET",
             }
@@ -50,7 +51,7 @@ class SampleRequest(BaseModel):
 
 
 class MockResponse(BaseModel):
-    """Response envelope for the POST /mock endpoint."""
+    """Response envelope for the POST /mock/schema and POST /mock/sample endpoints."""
 
     model_config = ConfigDict(
         json_schema_extra={
