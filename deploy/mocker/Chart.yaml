@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mocker
+description: Generates realistic mock data from internal FastAPI OpenAPI schemas.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

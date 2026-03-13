@@ -1,0 +1,18 @@
+replicaCount: 2
+
+image:
+  repository: registry.internal/mocker
+  pullPolicy: Always
+
+config:
+  environment: staging
+  debug: "false"
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: mocker.staging.internal
+      paths:
+        - path: /
+          pathType: Prefix

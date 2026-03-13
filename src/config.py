@@ -9,8 +9,6 @@ class Settings(BaseSettings):
 
     app_name: str = "Mocker API"
     description: str = "Generates realistic mock data from internal FastAPI OpenAPI schemas."
-    host: str = "0.0.0.0"
-    port: int = 8080
     environment: str = "development"
     debug: bool = False
 

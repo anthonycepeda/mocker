@@ -33,8 +33,15 @@ make run          # start the API (port 8080)
 make run-reload   # start with auto-reload (dev)
 
 # Docker
-make docker-build  # build image (mocker:<git-sha>)
+make docker-build  # build image tagged mocker:<git-sha>
 make docker-run    # run container on port 8080
+
+# Helm / Helmfile
+make helm-dev         # deploy to development
+make helm-staging     # deploy to staging
+make helm-production  # deploy to production
+make helm-diff ENV=staging     # dry-run diff
+make helm-destroy ENV=staging  # tear down a release
 ```
 
 ## Endpoints
@@ -48,12 +55,25 @@ make docker-run    # run container on port 8080
 
 ## Usage
 
+Use `schema_url` to point at any OpenAPI schema, or `app_name` for a registered well-known service. If both are given, `schema_url` wins.
+
 ```bash
+# by schema URL
 POST /mock
 Content-Type: application/json
 
 {
   "schema_url": "http://service-registry/openapi.json",
+  "endpoint": "/services/{id}",
+  "method": "GET"
+}
+
+# by app name (resolves to registered schema URL)
+POST /mock
+Content-Type: application/json
+
+{
+  "app_name": "service-registry",
   "endpoint": "/services/{id}",
   "method": "GET"
 }
@@ -101,5 +121,5 @@ uv run pytest -k "test_parse_route_returns_route_definition"
 - [x] Phase 3.5 — Health endpoints: `GET /health`, `GET /healthz`, `GET /ready`
 - [x] Phase 4 — Schema caching: `@lru_cache` on `fetch_schema`, `TestSettings` as test constant source
 - [x] Phase 5 — Dockerize: multi-stage `Dockerfile` + `.dockerignore` + `make docker-build/run`
-- [ ] Phase 6 — Helm + Helmfile: chart with `Deployment`, `Service`, `ConfigMap`; Helmfile for env overlays
+- [x] Phase 6 — Helm + Helmfile: `deploy/` chart (`Deployment`, `Service`, `ConfigMap`, `Ingress`); Helmfile for dev/staging/production overlays; `COMMIT_SHA` flows from Makefile to image tag
 - [ ] Phase 7 — Stub server: mirror all routes from a target service (drop-in replacement mode)
