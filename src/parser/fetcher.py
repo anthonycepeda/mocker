@@ -18,6 +18,4 @@ def fetch_schema(url: str) -> dict:
             f"Failed to fetch schema from {url}: HTTP {e.response.status_code}"
         ) from e
     except httpx.RequestError as e:
-        raise SchemaFetchError(
-            f"Failed to reach {url}: {e}"
-        ) from e
+        raise SchemaFetchError(f"Failed to reach {url}: {e}") from e

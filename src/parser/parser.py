@@ -29,9 +29,9 @@ def parse_route(schema: dict, path: str, method: str) -> RouteDefinition:
         raise SchemaParseError(f"Method '{method.upper()}' not found for path '{path}'")
 
     try:
-        response_schema = (
-            route[method_lower]["responses"]["200"]["content"]["application/json"]["schema"]
-        )
+        response_schema = route[method_lower]["responses"]["200"]["content"]["application/json"][
+            "schema"
+        ]
     except KeyError as e:
         raise SchemaParseError(
             f"No 200 JSON response schema found for {method.upper()} {path}: missing key {e}"
