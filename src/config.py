@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
 
 class TestSettings(Settings):
-    __test__ = False
+    __test__ = False  # prevent pytest from collecting this as a test class
 
     schema_url: HttpUrl = "http://test-service/openapi.json"
     endpoint: str = "/services/{id}"
