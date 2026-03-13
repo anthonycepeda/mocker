@@ -1,5 +1,6 @@
-from src.api.public.mock.models import MockRequest, MockResponse
+from src.api.public.mock.models import MockRequest, MockResponse, SampleRequest
 from src.generator import generate_mock
+from src.generator.sampler import generate_from_sample
 from src.parser.fetcher import fetch_schema
 from src.parser.parser import parse_route
 from src.utils.exceptions import SchemaParseError
@@ -40,3 +41,16 @@ def build_mock(request: MockRequest) -> MockResponse:
         status_code=200,
         mocked_from=schema_url,
     )
+
+
+def build_mock_from_sample(request: SampleRequest) -> MockResponse:
+    """Generate fake data by walking the shape of a caller-provided response sample.
+
+    Args:
+        request: A SampleRequest containing the response dict to use as a template.
+
+    Returns:
+        A MockResponse with regenerated data preserving the sample's structure.
+    """
+    data = generate_from_sample(request.sample)
+    return MockResponse(data=data, status_code=200, mocked_from="sample")
