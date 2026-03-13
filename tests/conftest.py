@@ -3,17 +3,17 @@ import pytest
 
 @pytest.fixture
 def simple_schema() -> dict:
-    """Minimal OpenAPI schema with a single GET /accounts/{id} endpoint."""
+    """Minimal OpenAPI schema with a single GET /services/{id} endpoint."""
     return {
         "openapi": "3.1.0",
         "paths": {
-            "/accounts/{id}": {
+            "/services/{id}": {
                 "get": {
                     "responses": {
                         "200": {
                             "content": {
                                 "application/json": {
-                                    "schema": {"$ref": "#/components/schemas/Account"}
+                                    "schema": {"$ref": "#/components/schemas/Service"}
                                 }
                             }
                         }
@@ -23,11 +23,14 @@ def simple_schema() -> dict:
         },
         "components": {
             "schemas": {
-                "Account": {
+                "Service": {
                     "type": "object",
                     "properties": {
                         "id": {"type": "string"},
-                        "balance": {"type": "number"},
+                        "name": {"type": "string"},
+                        "region": {"type": "string"},
+                        "ecosystem": {"type": "string"},
+                        "status": {"type": "string"},
                         "owner": {"$ref": "#/components/schemas/Owner"},
                     },
                 },

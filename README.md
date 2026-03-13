@@ -17,7 +17,7 @@ Writing mock fixtures by hand is tedious and drifts from the real schema over ti
 
 **Before** — your tests call the real service (or you maintain hand-rolled mocks):
 ```python
-response = httpx.get("http://payments-api/accounts/123")
+response = httpx.get("http://service-registry/services/abc-123")
 ```
 
 **After** — point `BASE_URL` at Mocker. No other changes:
@@ -28,11 +28,9 @@ response = httpx.get("http://localhost:8080/mock")  # returns fake but schema-va
 ## Getting Started
 
 ```bash
-# Install dependencies
-uv sync
-
-# Run the API
-uv run uvicorn src.api.main:app --reload
+make install  # install dependencies
+make run      # start the API (port 8080)
+make run-reload  # start with auto-reload (dev)
 ```
 
 ## Usage
@@ -42,8 +40,8 @@ POST /mock
 Content-Type: application/json
 
 {
-  "schema_url": "http://payments-api/openapi.json",
-  "endpoint": "/accounts/{id}",
+  "schema_url": "http://service-registry/openapi.json",
+  "endpoint": "/services/{id}",
   "method": "GET"
 }
 ```
@@ -51,12 +49,20 @@ Content-Type: application/json
 **Response:**
 ```json
 {
-  "id": "a3f2c1d0-...",
-  "balance": 4821.53,
-  "owner": {
-    "name": "Jane Smith",
-    "email": "jane.smith@example.com"
-  }
+  "data": {
+    "id": "a3f2c1d0-...",
+    "name": "trading-gateway",
+    "team_email": "platform-core@internal.example.com",
+    "region": "EMEA",
+    "ecosystem": "TRADECORE",
+    "status": "active",
+    "owner": {
+      "name": "Alice Martin",
+      "email": "alice.martin@internal.example.com"
+    }
+  },
+  "status_code": 200,
+  "mocked_from": "http://service-registry/openapi.json"
 }
 ```
 
@@ -65,8 +71,7 @@ Mocker fetches the OpenAPI schema from `schema_url`, resolves all `$ref` pointer
 ## Running Tests
 
 ```bash
-# All tests
-uv run pytest
+make test
 
 # Single file
 uv run pytest tests/unit/parser/test_parser.py
@@ -78,8 +83,7 @@ uv run pytest -k "test_parse_route_returns_route_definition"
 ## Roadmap
 
 - [x] Phase 1 — Parser: fetch OpenAPI schema, resolve `$ref`s, extract `RouteDefinition`
-- [ ] Phase 2 — Generator: walk `RouteDefinition` and produce fake data (Faker + semantic hints)
-- [ ] Phase 3 — API: `POST /mock` endpoint wiring parser + generator
-- [ ] Phase 4 — Semantic hints: field name inference (`email`, `iban`, `date`, `amount`)
-- [ ] Phase 5 — Schema caching: avoid re-fetching on every request
-- [ ] Phase 6 — Stub server: mirror all routes from a target service (drop-in replacement mode)
+- [x] Phase 2 — Generator: walk `RouteDefinition` and produce fake data (Faker + semantic hints for `email`, `iban`, `region`, `ecosystem`, etc.)
+- [x] Phase 3 — API: `POST /mock` endpoint wiring parser + generator
+- [ ] Phase 4 — Schema caching: avoid re-fetching on every request
+- [ ] Phase 5 — Stub server: mirror all routes from a target service (drop-in replacement mode)
