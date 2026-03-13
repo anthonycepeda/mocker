@@ -1,22 +1,33 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class MockRequest(BaseModel):
-    """Request body for the POST /mock endpoint."""
+    """Request body for the POST /mock endpoint.
+
+    Provide either `schema_url` or `app_name` (not both required).
+    If both are given, `schema_url` takes precedence.
+    """
 
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
-                "schema_url": "http://service-registry/openapi.json",
+                "app_name": "service-registry",
                 "endpoint": "/services/{id}",
                 "method": "GET",
             }
         }
     )
 
-    schema_url: str
+    schema_url: str | None = None
+    app_name: str | None = None
     endpoint: str
     method: str
+
+    @model_validator(mode="after")
+    def require_schema_url_or_app_name(self) -> "MockRequest":
+        if not self.schema_url and not self.app_name:
+            raise ValueError("Either 'schema_url' or 'app_name' must be provided.")
+        return self
 
 
 class MockResponse(BaseModel):
