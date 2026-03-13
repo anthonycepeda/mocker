@@ -7,4 +7,4 @@ settings = get_settings()
 app = create_app(settings)
 
 if __name__ == "__main__":
-    uvicorn.run("asgi:app", host=settings.host, port=settings.port, reload=True)
+    uvicorn.run("asgi:app", host="0.0.0.0", port=8080, reload=True)

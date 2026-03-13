@@ -18,7 +18,7 @@ ingress:
   className: ""
   annotations: {}
   hosts:
-    - host: mocker.internal
+    - host: mocker.example.com
       paths:
         - path: /
           pathType: Prefix

@@ -39,8 +39,8 @@ class SampleRequest(BaseModel):
             "example": {
                 "sample": {
                     "id": "a3f2c1d0-4e5b-4c6d-8f7e-1a2b3c4d5e6f",
-                    "name": "trading-gateway",
-                    "owner": {"name": "Alice Martin", "email": "alice@internal.example.com"},
+                    "name": "payment-gateway",
+                    "owner": {"name": "Jane Smith", "email": "jane.smith@example.com"},
                     "status": "active",
                 }
             }
@@ -58,13 +58,13 @@ class MockResponse(BaseModel):
             "example": {
                 "data": {
                     "id": "a3f2c1d0-4e5b-4c6d-8f7e-1a2b3c4d5e6f",
-                    "name": "trading-gateway",
+                    "name": "payment-gateway",
                     "region": "EMEA",
-                    "ecosystem": "TRADECORE",
+                    "ecosystem": "CORE",
                     "status": "active",
                     "owner": {
-                        "name": "Alice Martin",
-                        "email": "alice.martin@internal.example.com",
+                        "name": "Jane Smith",
+                        "email": "jane.smith@example.com",
                     },
                 },
                 "status_code": 200,

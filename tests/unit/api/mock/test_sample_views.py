@@ -11,8 +11,8 @@ _settings = TestSettings()
 SAMPLE_REQUEST_BODY = {
     "sample": {
         "id": "abc-123",
-        "name": "trading-gateway",
-        "owner": {"name": "Alice", "email": "alice@internal.com"},
+        "name": "payment-gateway",
+        "owner": {"name": "Jane", "email": "jane@example.com"},
         "status": "active",
     }
 }
