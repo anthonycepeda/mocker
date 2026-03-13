@@ -1,8 +1,11 @@
+from functools import lru_cache
+
 import httpx
 
 from src.utils.exceptions import SchemaFetchError
 
 
+@lru_cache(maxsize=128)
 def fetch_schema(url: str) -> dict:
     """Fetch and return the raw OpenAPI schema from the given URL.
 
