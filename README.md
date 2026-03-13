@@ -28,9 +28,13 @@ response = httpx.get("http://localhost:8080/mock")  # returns fake but schema-va
 ## Getting Started
 
 ```bash
-make install  # install dependencies
-make run      # start the API (port 8080)
-make run-reload  # start with auto-reload (dev)
+make install      # install dependencies
+make run          # start the API (port 8080)
+make run-reload   # start with auto-reload (dev)
+
+# Docker
+make docker-build  # build image (mocker:<git-sha>)
+make docker-run    # run container on port 8080
 ```
 
 ## Endpoints
@@ -95,5 +99,7 @@ uv run pytest -k "test_parse_route_returns_route_definition"
 - [x] Phase 2 — Generator: walk `RouteDefinition` and produce fake data (Faker + semantic hints for `email`, `iban`, `region`, `ecosystem`, etc.)
 - [x] Phase 3 — API: `POST /mock` endpoint wiring parser + generator
 - [x] Phase 3.5 — Health endpoints: `GET /health`, `GET /healthz`, `GET /ready`
-- [ ] Phase 4 — Schema caching: avoid re-fetching on every request
-- [ ] Phase 5 — Stub server: mirror all routes from a target service (drop-in replacement mode)
+- [x] Phase 4 — Schema caching: `@lru_cache` on `fetch_schema`, `TestSettings` as test constant source
+- [x] Phase 5 — Dockerize: multi-stage `Dockerfile` + `.dockerignore` + `make docker-build/run`
+- [ ] Phase 6 — Helm + Helmfile: chart with `Deployment`, `Service`, `ConfigMap`; Helmfile for env overlays
+- [ ] Phase 7 — Stub server: mirror all routes from a target service (drop-in replacement mode)

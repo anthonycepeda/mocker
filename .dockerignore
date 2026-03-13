@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+tests/
+examples/
+.claude/
+.vscode/
+*.code-workspace
+*.log
