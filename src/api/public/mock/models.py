@@ -30,6 +30,25 @@ class MockRequest(BaseModel):
         return self
 
 
+class SampleRequest(BaseModel):
+    """Request body for the POST /mock/sample endpoint."""
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "sample": {
+                    "id": "a3f2c1d0-4e5b-4c6d-8f7e-1a2b3c4d5e6f",
+                    "name": "trading-gateway",
+                    "owner": {"name": "Alice Martin", "email": "alice@internal.example.com"},
+                    "status": "active",
+                }
+            }
+        }
+    )
+
+    sample: dict
+
+
 class MockResponse(BaseModel):
     """Response envelope for the POST /mock endpoint."""
 
