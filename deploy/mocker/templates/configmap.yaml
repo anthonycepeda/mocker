@@ -5,7 +5,5 @@ metadata:
   labels:
     app: {{ .Release.Name }}
 data:
-  MOCKER_HOST: {{ .Values.config.host | quote }}
-  MOCKER_PORT: {{ .Values.config.port | quote }}
   MOCKER_ENVIRONMENT: {{ .Values.config.environment | quote }}
   MOCKER_DEBUG: {{ .Values.config.debug | quote }}

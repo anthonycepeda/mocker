@@ -10,16 +10,18 @@ service:
   port: 8080
 
 config:
-  host: "0.0.0.0"
-  port: "8080"
   environment: development
   debug: "false"
 
 ingress:
   enabled: false
   className: ""
-  host: mocker.internal
   annotations: {}
+  hosts:
+    - host: mocker.internal
+      paths:
+        - path: /
+          pathType: Prefix
 
 resources:
   requests:

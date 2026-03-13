@@ -11,7 +11,11 @@ config:
 ingress:
   enabled: true
   className: nginx
-  host: mocker.internal
+  hosts:
+    - host: mocker.internal
+      paths:
+        - path: /
+          pathType: Prefix
 
 resources:
   requests:
