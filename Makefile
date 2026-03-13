@@ -1,4 +1,6 @@
-.PHONY: install format lint test run
+IMAGE   := mocker:$(shell git rev-parse --short HEAD)
+
+.PHONY: install format lint test run run-reload docker-build docker-run
 
 install:
 	uv sync
@@ -19,3 +21,9 @@ run:
 
 run-reload:
 	uv run uvicorn asgi:app --host 0.0.0.0 --port 8080 --reload
+
+docker-build:
+	docker build -t $(IMAGE) .
+
+docker-run:
+	docker run --rm -p 8080:8080 $(IMAGE)
