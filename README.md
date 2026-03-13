@@ -122,4 +122,5 @@ uv run pytest -k "test_parse_route_returns_route_definition"
 - [x] Phase 4 — Schema caching: `@lru_cache` on `fetch_schema`, `TestSettings` as test constant source
 - [x] Phase 5 — Dockerize: multi-stage `Dockerfile` + `.dockerignore` + `make docker-build/run`
 - [x] Phase 6 — Helm + Helmfile: `deploy/` chart (`Deployment`, `Service`, `ConfigMap`, `Ingress`); Helmfile for dev/staging/production overlays; `COMMIT_SHA` flows from Makefile to image tag
-- [ ] Phase 7 — Stub server: mirror all routes from a target service (drop-in replacement mode)
+- [ ] Phase 7 — Sample-based mocking: `POST /mock/sample` accepts a real response dict and regenerates fake data from its shape; `POST /mock` renamed to `POST /mock/schema`
+- [ ] Phase 8 — Stub server: mirror all routes from a target service (drop-in replacement mode)
