@@ -25,3 +25,4 @@ CLAUDE.md
 # Misc
 *.log
 .python-version
+.ruff_cache/
