@@ -19,3 +19,13 @@ dev = [
     "respx>=0.22.0",
     "ruff>=0.15.6",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

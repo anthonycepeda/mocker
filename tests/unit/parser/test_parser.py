@@ -1,7 +1,7 @@
 import pytest
 
-from src.parser.parser import parse_route
 from src.parser.models import RouteDefinition
+from src.parser.parser import parse_route
 from src.utils.exceptions import SchemaParseError
 
 

@@ -22,11 +22,9 @@ def test_resolves_nested_ref(simple_schema):
 
 
 def test_does_not_mutate_original(simple_schema):
-    original_path_schema = (
-        simple_schema["paths"]["/accounts/{id}"]["get"]["responses"]["200"]["content"][
-            "application/json"
-        ]["schema"]
-    )
+    original_path_schema = simple_schema["paths"]["/accounts/{id}"]["get"]["responses"]["200"][
+        "content"
+    ]["application/json"]["schema"]
     resolve_refs(simple_schema)
     assert "$ref" in original_path_schema
 
@@ -38,9 +36,7 @@ def test_circular_ref_returns_empty():
             "schemas": {
                 "Node": {
                     "type": "object",
-                    "properties": {
-                        "child": {"$ref": "#/components/schemas/Node"}
-                    },
+                    "properties": {"child": {"$ref": "#/components/schemas/Node"}},
                 }
             }
         },

@@ -1,10 +1,9 @@
+import httpx
 import pytest
 import respx
-import httpx
 
 from src.parser.fetcher import fetch_schema
 from src.utils.exceptions import SchemaFetchError
-
 
 SCHEMA_URL = "http://test-service/openapi.json"
 
