@@ -33,6 +33,15 @@ make run      # start the API (port 8080)
 make run-reload  # start with auto-reload (dev)
 ```
 
+## Endpoints
+
+|Endpoint|Method|Description|
+|--------|------|-----------|
+|`/mock`|`POST`|Generate mock data from an OpenAPI schema|
+|`/health`|`GET`|Service health — `{"status": "ok"}`|
+|`/healthz`|`GET`|Kubernetes liveness probe — `{}`|
+|`/ready`|`GET`|Kubernetes readiness probe — `{}`|
+
 ## Usage
 
 ```bash
@@ -85,5 +94,6 @@ uv run pytest -k "test_parse_route_returns_route_definition"
 - [x] Phase 1 — Parser: fetch OpenAPI schema, resolve `$ref`s, extract `RouteDefinition`
 - [x] Phase 2 — Generator: walk `RouteDefinition` and produce fake data (Faker + semantic hints for `email`, `iban`, `region`, `ecosystem`, etc.)
 - [x] Phase 3 — API: `POST /mock` endpoint wiring parser + generator
+- [x] Phase 3.5 — Health endpoints: `GET /health`, `GET /healthz`, `GET /ready`
 - [ ] Phase 4 — Schema caching: avoid re-fetching on every request
 - [ ] Phase 5 — Stub server: mirror all routes from a target service (drop-in replacement mode)

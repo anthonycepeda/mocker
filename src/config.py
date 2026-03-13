@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,6 +15,14 @@ class Settings(BaseSettings):
     debug: bool = False
 
     model_config = SettingsConfigDict(env_prefix="MOCKER_", env_file=".env")
+
+
+class TestSettings(Settings):
+    __test__ = False
+
+    schema_url: HttpUrl = "http://test-service/openapi.json"
+    endpoint: str = "/services/{id}"
+    method: str = "GET"
 
 
 @lru_cache

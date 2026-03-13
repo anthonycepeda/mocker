@@ -5,12 +5,13 @@ from fastapi.testclient import TestClient
 
 from src.api.app import create_app
 from src.api.public.mock.models import MockResponse
-from src.config import Settings
+from src.config import TestSettings
 from src.utils.exceptions import SchemaFetchError, SchemaParseError
 
-SCHEMA_URL = "http://test-service/openapi.json"
+_settings = TestSettings()
+SCHEMA_URL = str(_settings.schema_url)
 
-MOCK_REQUEST_BODY = {"schema_url": SCHEMA_URL, "endpoint": "/services/{id}", "method": "GET"}
+MOCK_REQUEST_BODY = {"schema_url": SCHEMA_URL, "endpoint": _settings.endpoint, "method": _settings.method}
 
 MOCK_RESPONSE = MockResponse(
     data={"id": 1, "name": "Test"},
@@ -21,8 +22,7 @@ MOCK_RESPONSE = MockResponse(
 
 @pytest.fixture
 def client():
-    settings = Settings()
-    app = create_app(settings)
+    app = create_app(_settings)
     return TestClient(app)
 
 

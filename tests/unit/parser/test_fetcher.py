@@ -2,10 +2,18 @@ import httpx
 import pytest
 import respx
 
+from src.config import TestSettings
 from src.parser.fetcher import fetch_schema
 from src.utils.exceptions import SchemaFetchError
 
-SCHEMA_URL = "http://test-service/openapi.json"
+SCHEMA_URL = str(TestSettings().schema_url)
+
+
+@pytest.fixture(autouse=True)
+def clear_fetch_cache():
+    fetch_schema.cache_clear()
+    yield
+    fetch_schema.cache_clear()
 
 
 @respx.mock

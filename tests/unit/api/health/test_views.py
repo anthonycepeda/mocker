@@ -2,13 +2,12 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.api.app import create_app
-from src.config import Settings
+from src.config import TestSettings
 
 
 @pytest.fixture
 def client():
-    settings = Settings()
-    app = create_app(settings)
+    app = create_app(TestSettings())
     return TestClient(app)
 
 
