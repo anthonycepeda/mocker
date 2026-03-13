@@ -17,7 +17,7 @@ Writing mock fixtures by hand is tedious and drifts from the real schema over ti
 
 **Before** — your tests call the real service (or you maintain hand-rolled mocks):
 ```python
-response = httpx.get("http://service-registry/services/abc-123")
+response = httpx.get("http://user-service/users/abc-123")
 ```
 
 **After** — point `BASE_URL` at Mocker. No other changes:
@@ -48,7 +48,8 @@ make helm-destroy ENV=staging  # tear down a release
 
 |Endpoint|Method|Description|
 |--------|------|-----------|
-|`/mock`|`POST`|Generate mock data from an OpenAPI schema|
+|`/mock/schema`|`POST`|Generate mock data from an OpenAPI schema URL or registered app name|
+|`/mock/sample`|`POST`|Regenerate fake data from a caller-provided response dict|
 |`/health`|`GET`|Service health — `{"status": "ok"}`|
 |`/healthz`|`GET`|Kubernetes liveness probe — `{}`|
 |`/ready`|`GET`|Kubernetes readiness probe — `{}`|
@@ -59,22 +60,22 @@ Use `schema_url` to point at any OpenAPI schema, or `app_name` for a registered 
 
 ```bash
 # by schema URL
-POST /mock
+POST /mock/schema
 Content-Type: application/json
 
 {
-  "schema_url": "http://service-registry/openapi.json",
-  "endpoint": "/services/{id}",
+  "schema_url": "http://user-service/openapi.json",
+  "endpoint": "/users/{id}",
   "method": "GET"
 }
 
 # by app name (resolves to registered schema URL)
-POST /mock
+POST /mock/schema
 Content-Type: application/json
 
 {
-  "app_name": "service-registry",
-  "endpoint": "/services/{id}",
+  "app_name": "user-service",
+  "endpoint": "/users/{id}",
   "method": "GET"
 }
 ```
@@ -84,18 +85,17 @@ Content-Type: application/json
 {
   "data": {
     "id": "a3f2c1d0-...",
-    "name": "trading-gateway",
-    "team_email": "platform-core@internal.example.com",
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com",
     "region": "EMEA",
-    "ecosystem": "TRADECORE",
     "status": "active",
     "owner": {
-      "name": "Alice Martin",
-      "email": "alice.martin@internal.example.com"
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com"
     }
   },
   "status_code": 200,
-  "mocked_from": "http://service-registry/openapi.json"
+  "mocked_from": "http://user-service/openapi.json"
 }
 ```
 

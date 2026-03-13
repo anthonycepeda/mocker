@@ -1,7 +1,7 @@
 replicaCount: 3
 
 image:
-  repository: registry.internal/mocker
+  repository: registry.example.com/mocker
   pullPolicy: Always
 
 config:
@@ -12,7 +12,7 @@ ingress:
   enabled: true
   className: nginx
   hosts:
-    - host: mocker.internal
+    - host: mocker.example.com
       paths:
         - path: /
           pathType: Prefix
