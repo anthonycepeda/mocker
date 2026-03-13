@@ -11,7 +11,11 @@ from src.utils.exceptions import SchemaFetchError, SchemaParseError
 _settings = TestSettings()
 SCHEMA_URL = str(_settings.schema_url)
 
-MOCK_REQUEST_BODY = {"schema_url": SCHEMA_URL, "endpoint": _settings.endpoint, "method": _settings.method}
+MOCK_REQUEST_BODY = {
+    "schema_url": SCHEMA_URL,
+    "endpoint": _settings.endpoint,
+    "method": _settings.method,
+}
 
 MOCK_RESPONSE = MockResponse(
     data={"id": 1, "name": "Test"},
