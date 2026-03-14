@@ -31,13 +31,44 @@ def test_build_mock_returns_mock_response(simple_schema):
 
 
 @respx.mock
-def test_build_mock_data_is_dict(simple_schema):
+def test_build_mock_data_is_dict_for_object_schema(simple_schema):
     respx.get(SCHEMA_URL).mock(return_value=httpx.Response(200, json=simple_schema))
     request = MockRequest(
         schema_url=SCHEMA_URL, endpoint=_settings.endpoint, method=_settings.method
     )
     result = build_mock(request)
     assert isinstance(result.data, dict)
+
+
+@respx.mock
+def test_build_mock_data_is_list_for_array_schema(simple_schema):
+    array_schema = {
+        **simple_schema,
+        "paths": {
+            _settings.endpoint: {
+                _settings.method.lower(): {
+                    "responses": {
+                        "200": {
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "array",
+                                        "items": {"$ref": "#/components/schemas/Service"},
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    }
+    respx.get(SCHEMA_URL).mock(return_value=httpx.Response(200, json=array_schema))
+    request = MockRequest(
+        schema_url=SCHEMA_URL, endpoint=_settings.endpoint, method=_settings.method
+    )
+    result = build_mock(request)
+    assert isinstance(result.data, list)
 
 
 @respx.mock
