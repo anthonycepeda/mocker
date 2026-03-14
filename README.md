@@ -140,6 +140,23 @@ apps:
 
 Any field whose name contains the pattern (case-insensitive substring) will pick a random value from the list. When calling `/mock/schema` with an `app_name`, app-specific hints are merged on top of the global ones. Custom hints override built-in Faker hints. `apps` is a reserved key and never matches a field name.
 
+**Kubernetes / Helm:** set `customHints.enabled: true` and provide the file content inline in your env's values file — the chart renders it into a ConfigMap, mounts it, and sets `MOCKER_CUSTOM_HINTS_PATH` automatically:
+
+```yaml
+# deploy/values/development.yaml
+customHints:
+  enabled: true
+  content: |
+    status:
+      - active
+      - inactive
+    apps:
+      payment-gateway:
+        status:
+          - processing
+          - settled
+```
+
 ## Running Tests
 
 ```bash
