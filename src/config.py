@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = False
     custom_hints_path: Path | None = None
+    log_level: str = "INFO"
 
     model_config = SettingsConfigDict(env_prefix="MOCKER_", env_file=".env")
 
