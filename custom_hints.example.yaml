@@ -1,0 +1,22 @@
+# custom_hints.example.yaml
+#
+# Copy this file and point MOCKER_CUSTOM_HINTS_PATH at it to define domain-specific
+# field value sets. Mocker will pick a random value from the list whenever a field
+# name contains the pattern (case-insensitive substring match).
+#
+# Priority: schema enum > custom hints > built-in faker hints > type fallback
+
+status:
+  - active
+  - inactive
+  - pending
+
+environment:
+  - prod
+  - staging
+  - dev
+
+tier:
+  - gold
+  - silver
+  - bronze
