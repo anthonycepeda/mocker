@@ -101,6 +101,11 @@ Content-Type: application/json
 
 Mocker fetches the OpenAPI schema from `schema_url`, resolves all `$ref` pointers, and returns a fake but structurally valid response for the requested endpoint and method.
 
+Field values are generated with the following priority:
+1. **Enum** — if the schema defines allowed values, one is picked at random (works with inline enums and FastAPI's nullable `anyOf` pattern)
+2. **Semantic hints** — field names like `email`, `iban`, `name`, `region` produce realistic values via Faker
+3. **Type-based** — fallback generation for `string`, `integer`, `number`, `boolean`, `array`, `object`
+
 ## Running Tests
 
 ```bash
