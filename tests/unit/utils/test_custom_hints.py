@@ -1,13 +1,28 @@
 import pytest
 
-from src.utils.custom_hints import apply_custom_hint, load_custom_hints
+from src.utils.custom_hints import apply_custom_hint, load_custom_hints, resolve_hints_for_app
 
 
 @pytest.fixture
 def hints_file(tmp_path):
     f = tmp_path / "hints.yaml"
-    f.write_text("status:\n  - active\n  - inactive\n  - pending\ntier:\n  - gold\n  - silver\n")
+    f.write_text(
+        "status:\n"
+        "  - active\n"
+        "  - inactive\n"
+        "tier:\n"
+        "  - gold\n"
+        "  - silver\n"
+        "apps:\n"
+        "  payment-gateway:\n"
+        "    status:\n"
+        "      - processing\n"
+        "      - settled\n"
+    )
     return f
+
+
+# --- load_custom_hints ---
 
 
 def test_load_returns_dict(hints_file):
@@ -15,10 +30,16 @@ def test_load_returns_dict(hints_file):
     assert isinstance(result, dict)
 
 
-def test_load_values_are_lists(hints_file):
+def test_load_global_values_are_lists(hints_file):
     result = load_custom_hints(hints_file)
     assert isinstance(result["status"], list)
     assert isinstance(result["tier"], list)
+
+
+def test_load_apps_section_is_parsed(hints_file):
+    result = load_custom_hints(hints_file)
+    assert "apps" in result
+    assert "payment-gateway" in result["apps"]
 
 
 def test_load_raises_on_non_mapping(tmp_path):
@@ -28,11 +49,62 @@ def test_load_raises_on_non_mapping(tmp_path):
         load_custom_hints(f)
 
 
-def test_load_raises_on_non_list_value(tmp_path):
+def test_load_raises_on_non_list_global_value(tmp_path):
     f = tmp_path / "bad.yaml"
     f.write_text("status: active\n")
     with pytest.raises(ValueError, match="list"):
         load_custom_hints(f)
+
+
+def test_load_raises_on_non_list_app_value(tmp_path):
+    f = tmp_path / "bad.yaml"
+    f.write_text("apps:\n  payment-gateway:\n    status: active\n")
+    with pytest.raises(ValueError, match="list"):
+        load_custom_hints(f)
+
+
+def test_load_raises_on_non_mapping_apps(tmp_path):
+    f = tmp_path / "bad.yaml"
+    f.write_text("apps:\n  - item\n")
+    with pytest.raises(ValueError, match="apps"):
+        load_custom_hints(f)
+
+
+# --- resolve_hints_for_app ---
+
+
+def test_resolve_no_app_returns_global_only(hints_file):
+    raw = load_custom_hints(hints_file)
+    result = resolve_hints_for_app(raw, app_name=None)
+    assert "status" in result
+    assert "apps" not in result
+
+
+def test_resolve_app_overrides_global(hints_file):
+    raw = load_custom_hints(hints_file)
+    result = resolve_hints_for_app(raw, app_name="payment-gateway")
+    assert result["status"] == ["processing", "settled"]
+
+
+def test_resolve_app_inherits_non_overridden_globals(hints_file):
+    raw = load_custom_hints(hints_file)
+    result = resolve_hints_for_app(raw, app_name="payment-gateway")
+    assert result["tier"] == ["gold", "silver"]
+
+
+def test_resolve_unknown_app_returns_global_only(hints_file):
+    raw = load_custom_hints(hints_file)
+    result = resolve_hints_for_app(raw, app_name="unknown-service")
+    assert result["status"] == ["active", "inactive"]
+
+
+def test_resolve_apps_key_not_in_result(hints_file):
+    raw = load_custom_hints(hints_file)
+    result = resolve_hints_for_app(raw, app_name="payment-gateway")
+    assert "apps" not in result
+
+
+# --- apply_custom_hint ---
 
 
 def test_apply_exact_match():
