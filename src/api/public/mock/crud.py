@@ -6,7 +6,10 @@ from src.parser.fetcher import fetch_schema
 from src.parser.parser import parse_route
 from src.utils.custom_hints import load_custom_hints, resolve_hints_for_app
 from src.utils.exceptions import SchemaParseError
+from src.utils.logger import logger_config
 from src.utils.registry import APP_REGISTRY
+
+logger = logger_config(__name__)
 
 
 def _resolve_custom_hints(app_name: str | None = None) -> dict[str, list] | None:
@@ -46,9 +49,11 @@ def build_mock(request: MockRequest) -> MockResponse:
             is not in the registry.
     """
     schema_url = _resolve_schema_url(request)
+    logger.info("mock requested", extra={"endpoint": request.endpoint, "method": request.method})
     schema = fetch_schema(schema_url)
     route = parse_route(schema, request.endpoint, request.method)
     data = generate_mock(route, custom_hints=_resolve_custom_hints(request.app_name))
+    logger.info("mock generated", extra={"endpoint": request.endpoint, "method": request.method})
 
     return MockResponse(
         data=data,

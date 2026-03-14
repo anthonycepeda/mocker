@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
+    "asgi-correlation-id>=4.3.4",
     "faker>=40.8.0",
     "fastapi>=0.135.1",
     "httpx>=0.28.1",
