@@ -118,18 +118,27 @@ MOCKER_CUSTOM_HINTS_PATH=/path/to/custom_hints.yaml
 ```
 
 ```yaml
-# custom_hints.yaml
+# global — applied to all apps
 status:
   - active
   - inactive
   - pending
-tier:
-  - gold
-  - silver
-  - bronze
+
+# per-app overrides — app wins over global for the same pattern
+apps:
+  payment-gateway:
+    status:
+      - processing
+      - settled
+      - failed
+  order-service:
+    status:
+      - placed
+      - shipped
+      - delivered
 ```
 
-Any field whose name contains the pattern (case-insensitive substring) will pick a random value from the list. Custom hints override built-in Faker hints — if you define `email`, your values win.
+Any field whose name contains the pattern (case-insensitive substring) will pick a random value from the list. When calling `/mock/schema` with an `app_name`, app-specific hints are merged on top of the global ones. Custom hints override built-in Faker hints. `apps` is a reserved key and never matches a field name.
 
 ## Running Tests
 

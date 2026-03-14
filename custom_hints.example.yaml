@@ -5,6 +5,11 @@
 # name contains the pattern (case-insensitive substring match).
 #
 # Priority: schema enum > custom hints > built-in faker hints > type fallback
+#
+# The reserved key `apps` holds per-app overrides. App-specific hints win over
+# global hints for the same pattern. The `apps` key itself never matches a field.
+
+# --- global (apply to all apps) ---
 
 status:
   - active
@@ -20,3 +25,18 @@ tier:
   - gold
   - silver
   - bronze
+
+# --- per-app overrides ---
+
+apps:
+  payment-gateway:
+    status:
+      - processing
+      - settled
+      - failed
+
+  order-service:
+    status:
+      - placed
+      - shipped
+      - delivered
