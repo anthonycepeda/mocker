@@ -99,6 +99,8 @@ Content-Type: application/json
 }
 ```
 
+`data` is a `dict` for object-returning endpoints and a `list` for array-returning endpoints — it mirrors the actual schema shape.
+
 Mocker fetches the OpenAPI schema from `schema_url`, resolves all `$ref` pointers, and returns a fake but structurally valid response for the requested endpoint and method.
 
 Field values are generated with the following priority:

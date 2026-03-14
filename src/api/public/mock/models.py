@@ -73,6 +73,6 @@ class MockResponse(BaseModel):
         }
     )
 
-    data: dict
+    data: dict | list
     status_code: int
     mocked_from: str
