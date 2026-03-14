@@ -96,12 +96,12 @@ def test_any_of_with_enum_branch_uses_enum_values(faker):
     # FastAPI nullable enum pattern: anyOf with enum branch and null branch
     schema = {
         "anyOf": [
-            {"type": "string", "enum": ["poweredOn", "poweredOff"]},
+            {"type": "string", "enum": ["On", "Off"]},
             {"type": "null"},
         ]
     }
     result = build_value(schema, "power_state", faker)
-    assert result in ["poweredOn", "poweredOff"]
+    assert result in ["On", "Off"]
 
 
 def test_any_of_prefers_enum_branch_over_plain_string_branch(faker):
