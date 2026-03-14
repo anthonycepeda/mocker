@@ -67,8 +67,17 @@ price:
 
 host:
   generator: hostname
-  prefix: host
+  prefix: host        # single fixed prefix
   digits: 5
+
+# or, pick a prefix at random (e.g. regional hostnames)
+# host:
+#   generator: hostname
+#   prefix_choices:
+#     - ehost   # EMEA
+#     - ahost   # AMER
+#     - chost   # APAC
+#   digits: 5
 
 owner:
   generator: owner

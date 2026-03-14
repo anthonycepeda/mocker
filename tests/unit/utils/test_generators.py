@@ -112,6 +112,14 @@ def test_hostname_custom_prefix_and_digits(spec, faker):
     assert re.fullmatch(r"srv\d{3}", result)
 
 
+def test_hostname_prefix_choices_picks_from_list(spec, faker):
+    prefixes = ["ehost", "ahost", "chost"]
+    for _ in range(20):  # run multiple times to hit all branches
+        result = run_generator(spec("hostname", prefix_choices=prefixes, digits=5), faker)
+        assert any(result.startswith(p) for p in prefixes)
+        assert re.fullmatch(r"[a-z]+\d{5}", result)
+
+
 def test_owner_six_digits_or_letter_plus_four(spec, faker):
     for _ in range(20):  # run multiple times to hit both branches
         result = run_generator(spec("owner"), faker)
