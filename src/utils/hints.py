@@ -61,7 +61,7 @@ def apply_hint(
     if custom_hints:
         from src.utils.custom_hints import apply_custom_hint
 
-        matched, value = apply_custom_hint(field_name, custom_hints)
+        matched, value = apply_custom_hint(field_name, custom_hints, faker)
         if matched:
             return True, value
 

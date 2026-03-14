@@ -1,16 +1,23 @@
 # custom_hints.example.yaml
 #
 # Copy this file and point MOCKER_CUSTOM_HINTS_PATH at it to define domain-specific
-# field value sets. Mocker will pick a random value from the list whenever a field
-# name contains the pattern (case-insensitive substring match).
+# field value sets. Each key is matched as a case-insensitive substring of the field name.
 #
 # Priority: schema enum > custom hints > built-in faker hints > type fallback
 #
-# The reserved key `apps` holds per-app overrides. App-specific hints win over
-# global hints for the same pattern. The `apps` key itself never matches a field.
+# Two hint styles:
+#   list      — picks a random item from the list
+#   generator — generates a value following a naming convention
+#
+# Available generators: slug, code_upper, code_lower, word_sequence,
+#                        numeric_id, float_value, hostname, owner
+#
+# The reserved key `apps` holds per-app overrides (same pattern → list/spec structure).
+# App-specific hints win over global hints for the same pattern.
 
 # --- global (apply to all apps) ---
 
+# list style
 status:
   - active
   - inactive
@@ -25,6 +32,46 @@ tier:
   - gold
   - silver
   - bronze
+
+# generator style
+sub_name:
+  generator: slug
+  min_length: 6
+  max_length: 20
+
+service_code:
+  generator: code_upper
+  min_length: 6
+  max_length: 8
+
+ref_code:
+  generator: code_lower
+  min_length: 6
+  max_length: 8
+
+label:
+  generator: word_sequence
+  num_words: 3
+  separator: "-"
+
+order_id:
+  generator: numeric_id
+  min_value: 100000
+  max_value: 999999
+  length: 6
+
+price:
+  generator: float_value
+  min_value: 1.0
+  max_value: 2000.0
+
+host:
+  generator: hostname
+  prefix: host
+  digits: 5
+
+owner:
+  generator: owner
 
 # --- per-app overrides ---
 
