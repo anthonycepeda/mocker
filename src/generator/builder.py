@@ -9,9 +9,9 @@ def build_value(schema: dict, field_name: str, faker: Faker) -> any:
     """Recursively build a fake value for a given JSON Schema node.
 
     Resolution order:
-    1. Semantic hint (field name match)
-    2. Enum
-    3. anyOf (pick first non-null branch)
+    1. Enum — explicit schema constraint always wins
+    2. anyOf — prefer branches that carry an enum, then first non-null branch
+    3. Semantic hint (field name match)
     4. Type-based generation
 
     Args:
@@ -22,18 +22,19 @@ def build_value(schema: dict, field_name: str, faker: Faker) -> any:
     Returns:
         A fake value matching the schema's type and constraints.
     """
-    matched, hint_value = apply_hint(field_name, faker)
-    if matched:
-        return hint_value
-
     if "enum" in schema:
         return random.choice(schema["enum"])
 
     if "anyOf" in schema:
         non_null = [s for s in schema["anyOf"] if s.get("type") != "null"]
         if non_null:
-            return build_value(non_null[0], field_name, faker)
+            enum_branch = next((s for s in non_null if "enum" in s), None)
+            return build_value(enum_branch or non_null[0], field_name, faker)
         return None
+
+    matched, hint_value = apply_hint(field_name, faker)
+    if matched:
+        return hint_value
 
     schema_type = schema.get("type")
 

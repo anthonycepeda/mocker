@@ -85,6 +85,37 @@ def test_hint_takes_priority_over_type(faker):
     assert "@" in result
 
 
+def test_enum_takes_priority_over_hint(faker):
+    # field name "name" would normally trigger the name hint — enum must win
+    schema = {"type": "string", "enum": ["service-a", "service-b", "service-c"]}
+    result = build_value(schema, "name", faker)
+    assert result in ["service-a", "service-b", "service-c"]
+
+
+def test_any_of_with_enum_branch_uses_enum_values(faker):
+    # FastAPI nullable enum pattern: anyOf with enum branch and null branch
+    schema = {
+        "anyOf": [
+            {"type": "string", "enum": ["On", "Off"]},
+            {"type": "null"},
+        ]
+    }
+    result = build_value(schema, "power_state", faker)
+    assert result in ["On", "Off"]
+
+
+def test_any_of_prefers_enum_branch_over_plain_string_branch(faker):
+    # when anyOf has both a plain string branch and an enum branch, enum wins
+    schema = {
+        "anyOf": [
+            {"type": "string"},
+            {"type": "string", "enum": ["draft", "published", "archived"]},
+        ]
+    }
+    result = build_value(schema, "state", faker)
+    assert result in ["draft", "published", "archived"]
+
+
 def test_region_hint(faker):
     result = build_value({"type": "string"}, "region", faker)
     assert result in ["EMEA", "AMER", "APAC"]
