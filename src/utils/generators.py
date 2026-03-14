@@ -78,12 +78,17 @@ def generate_float_value(spec: dict, faker: Faker) -> float:
 
 
 def generate_hostname(spec: dict, faker: Faker) -> str:
-    """Fixed prefix followed by a zero-padded numeric suffix.
+    """Prefix followed by a zero-padded numeric suffix.
 
-    Spec keys: prefix (default 'host'), digits (default 5).
-    Example: host00042
+    Spec keys:
+      prefix         — fixed string prefix (default 'host')
+      prefix_choices — list of prefixes to pick from at random (overrides prefix)
+      digits         — number of digits in the suffix (default 5)
+
+    Examples: host00042 | ehost00007 | ahost00099
     """
-    prefix = spec.get("prefix", "host")
+    prefix_choices = spec.get("prefix_choices")
+    prefix = random.choice(prefix_choices) if prefix_choices else spec.get("prefix", "host")
     digits = spec.get("digits", 5)
     number = random.randint(1, 10**digits - 1)
     return f"{prefix}{str(number).zfill(digits)}"
