@@ -25,6 +25,15 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-config
+          {{- if .Values.customHints.enabled }}
+          env:
+            - name: MOCKER_CUSTOM_HINTS_PATH
+              value: /config/custom_hints.yaml
+          volumeMounts:
+            - name: custom-hints
+              mountPath: /config
+              readOnly: true
+          {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -39,3 +48,9 @@ spec:
             periodSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.customHints.enabled }}
+      volumes:
+        - name: custom-hints
+          configMap:
+            name: {{ .Release.Name }}-custom-hints
+      {{- end }}
