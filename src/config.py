@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -11,6 +12,7 @@ class Settings(BaseSettings):
     description: str = "Generates realistic mock data from internal FastAPI OpenAPI schemas."
     environment: str = "development"
     debug: bool = False
+    custom_hints_path: Path | None = None
 
     model_config = SettingsConfigDict(env_prefix="MOCKER_", env_file=".env")
 

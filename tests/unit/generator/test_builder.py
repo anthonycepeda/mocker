@@ -1,12 +1,4 @@
-import pytest
-from faker import Faker
-
 from src.generator.builder import build_value
-
-
-@pytest.fixture
-def faker():
-    return Faker()
 
 
 def test_builds_string(faker):

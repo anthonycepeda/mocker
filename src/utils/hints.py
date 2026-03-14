@@ -37,8 +37,14 @@ _HINTS: dict[str, callable] = {
 }
 
 
-def apply_hint(field_name: str, faker: Faker) -> tuple[bool, any]:
-    """Check if a field name matches a semantic hint and return a fake value.
+def apply_hint(
+    field_name: str, faker: Faker, custom_hints: dict[str, list] | None = None
+) -> tuple[bool, any]:
+    """Check if a field name matches a hint and return a fake value.
+
+    Resolution order:
+    1. Custom hints (from config file) — checked first so teams can override built-ins
+    2. Built-in semantic hints (Faker-based)
 
     Matches by checking whether any hint key appears as a substring of the
     field name (case-insensitive). For example, "user_email" matches "email".
@@ -46,11 +52,19 @@ def apply_hint(field_name: str, faker: Faker) -> tuple[bool, any]:
     Args:
         field_name: The name of the field being generated.
         faker: A Faker instance to use for generation.
+        custom_hints: Optional mapping loaded from a custom hints YAML file.
 
     Returns:
         A tuple of (matched: bool, value: any).
         If no hint matched, returns (False, None).
     """
+    if custom_hints:
+        from src.utils.custom_hints import apply_custom_hint
+
+        matched, value = apply_custom_hint(field_name, custom_hints)
+        if matched:
+            return True, value
+
     lower = field_name.lower()
     for key, generator in _HINTS.items():
         if key in lower:

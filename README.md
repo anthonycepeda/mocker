@@ -105,8 +105,31 @@ Mocker fetches the OpenAPI schema from `schema_url`, resolves all `$ref` pointer
 
 Field values are generated with the following priority:
 1. **Enum** — if the schema defines allowed values, one is picked at random (works with inline enums and FastAPI's nullable `anyOf` pattern)
-2. **Semantic hints** — field names like `email`, `iban`, `name`, `region` produce realistic values via Faker
-3. **Type-based** — fallback generation for `string`, `integer`, `number`, `boolean`, `array`, `object`
+2. **Custom hints** — team-defined value lists loaded from a YAML file (set `MOCKER_CUSTOM_HINTS_PATH`)
+3. **Semantic hints** — field names like `email`, `iban`, `name`, `region` produce realistic values via Faker
+4. **Type-based** — fallback generation for `string`, `integer`, `number`, `boolean`, `array`, `object`
+
+### Custom hints
+
+Copy `custom_hints.example.yaml`, add your domain values, and point Mocker at it:
+
+```bash
+MOCKER_CUSTOM_HINTS_PATH=/path/to/custom_hints.yaml
+```
+
+```yaml
+# custom_hints.yaml
+status:
+  - active
+  - inactive
+  - pending
+tier:
+  - gold
+  - silver
+  - bronze
+```
+
+Any field whose name contains the pattern (case-insensitive substring) will pick a random value from the list. Custom hints override built-in Faker hints — if you define `email`, your values win.
 
 ## Running Tests
 

@@ -1,10 +1,20 @@
 from src.api.public.mock.models import MockRequest, MockResponse, SampleRequest
+from src.config import get_settings
 from src.generator import generate_mock
 from src.generator.sampler import generate_from_sample
 from src.parser.fetcher import fetch_schema
 from src.parser.parser import parse_route
+from src.utils.custom_hints import load_custom_hints
 from src.utils.exceptions import SchemaParseError
 from src.utils.registry import APP_REGISTRY
+
+
+def _load_custom_hints() -> dict[str, list] | None:
+    """Load custom hints from the configured YAML file, or return None if not configured."""
+    path = get_settings().custom_hints_path
+    if path is None:
+        return None
+    return load_custom_hints(path)
 
 
 def _resolve_schema_url(request: MockRequest) -> str:
@@ -34,7 +44,7 @@ def build_mock(request: MockRequest) -> MockResponse:
     schema_url = _resolve_schema_url(request)
     schema = fetch_schema(schema_url)
     route = parse_route(schema, request.endpoint, request.method)
-    data = generate_mock(route)
+    data = generate_mock(route, custom_hints=_load_custom_hints())
 
     return MockResponse(
         data=data,
@@ -52,5 +62,5 @@ def build_mock_from_sample(request: SampleRequest) -> MockResponse:
     Returns:
         A MockResponse with regenerated data preserving the sample's structure.
     """
-    data = generate_from_sample(request.sample)
+    data = generate_from_sample(request.sample, custom_hints=_load_custom_hints())
     return MockResponse(data=data, status_code=200, mocked_from="sample")
