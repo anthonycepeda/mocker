@@ -66,6 +66,41 @@ def test_generate_mock_produces_different_results_each_call(simple_schema):
     assert result_1 != result_2
 
 
+def test_generate_mock_overrides_matching_field(simple_schema):
+    from src.parser.parser import parse_route
+
+    route = parse_route(simple_schema, "/services/{id}", "GET")
+    result = generate_mock(route, overrides={"region": "EMEA"})
+    assert result["region"] == "EMEA"
+
+
+def test_generate_mock_overrides_ignores_unknown_keys(simple_schema):
+    from src.parser.parser import parse_route
+
+    route = parse_route(simple_schema, "/services/{id}", "GET")
+    result = generate_mock(route, overrides={"nonexistent_field": "value"})
+    assert "nonexistent_field" not in result
+
+
+def test_generate_mock_overrides_multiple_fields(simple_schema):
+    from src.parser.parser import parse_route
+
+    route = parse_route(simple_schema, "/services/{id}", "GET")
+    result = generate_mock(route, overrides={"region": "AMER", "ecosystem": "CORE"})
+    assert result["region"] == "AMER"
+    assert result["ecosystem"] == "CORE"
+
+
+def test_generate_mock_overrides_skipped_for_list_response():
+    route = RouteDefinition(
+        path="/items",
+        method="get",
+        response_schema={"type": "array", "items": {"type": "string"}},
+    )
+    result = generate_mock(route, overrides={"region": "EMEA"})
+    assert isinstance(result, list)
+
+
 def test_generate_mock_works_with_inline_route_definition():
     route = RouteDefinition(
         path="/items",

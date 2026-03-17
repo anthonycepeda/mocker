@@ -144,3 +144,63 @@ def test_build_mock_raises_on_unknown_app_name():
 def test_mock_request_raises_if_neither_schema_url_nor_app_name():
     with pytest.raises(ValueError, match="Either"):
         MockRequest(endpoint=_settings.endpoint, method=_settings.method)
+
+
+@respx.mock
+def test_build_mock_status_code_from_schema(simple_schema):
+    schema_201 = {
+        **simple_schema,
+        "paths": {
+            _settings.endpoint: {
+                _settings.method.lower(): {
+                    "responses": {
+                        "201": simple_schema["paths"][_settings.endpoint][
+                            _settings.method.lower()
+                        ]["responses"]["200"]
+                    }
+                }
+            }
+        },
+    }
+    respx.get(SCHEMA_URL).mock(return_value=httpx.Response(200, json=schema_201))
+    request = MockRequest(
+        schema_url=SCHEMA_URL, endpoint=_settings.endpoint, method=_settings.method
+    )
+    result = build_mock(request)
+    assert result.status_code == 201
+
+
+@respx.mock
+def test_build_mock_overrides_echo_matching_field(simple_schema):
+    respx.get(SCHEMA_URL).mock(return_value=httpx.Response(200, json=simple_schema))
+    request = MockRequest(
+        schema_url=SCHEMA_URL,
+        endpoint=_settings.endpoint,
+        method=_settings.method,
+        overrides={"region": "EMEA"},
+    )
+    result = build_mock(request)
+    assert result.data["region"] == "EMEA"
+
+
+@respx.mock
+def test_build_mock_overrides_unknown_keys_ignored(simple_schema):
+    respx.get(SCHEMA_URL).mock(return_value=httpx.Response(200, json=simple_schema))
+    request = MockRequest(
+        schema_url=SCHEMA_URL,
+        endpoint=_settings.endpoint,
+        method=_settings.method,
+        overrides={"nonexistent_field": "value"},
+    )
+    result = build_mock(request)
+    assert "nonexistent_field" not in result.data
+
+
+@respx.mock
+def test_build_mock_without_overrides_unchanged(simple_schema):
+    respx.get(SCHEMA_URL).mock(return_value=httpx.Response(200, json=simple_schema))
+    request = MockRequest(
+        schema_url=SCHEMA_URL, endpoint=_settings.endpoint, method=_settings.method
+    )
+    result = build_mock(request)
+    assert isinstance(result.data, dict)

@@ -23,6 +23,7 @@ class MockRequest(BaseModel):
     app_name: str | None = None
     endpoint: str
     method: str
+    overrides: dict | None = None
 
     @model_validator(mode="after")
     def require_schema_url_or_app_name(self) -> "MockRequest":

@@ -103,6 +103,33 @@ Content-Type: application/json
 
 Mocker fetches the OpenAPI schema from `schema_url`, resolves all `$ref` pointers, and returns a fake but structurally valid response for the requested endpoint and method.
 
+### Response overrides
+
+Pass an `overrides` dict to echo specific values back in the response. Any key that matches a top-level field in the generated response is replaced with the provided value — unknown keys are silently ignored, and overrides are skipped entirely when the response is a list.
+
+This is useful when a test asserts on a specific field (e.g. the username you just sent in a create-user request):
+
+```bash
+POST /mock/schema
+Content-Type: application/json
+
+{
+  "schema_url": "http://user-service/openapi.json",
+  "endpoint": "/users",
+  "method": "POST",
+  "overrides": {
+    "username": "d11111",
+    "region": "EMEA"
+  }
+}
+```
+
+The response `data` will contain `"username": "d11111"` and `"region": "EMEA"` — all other fields are still randomly generated from the schema.
+
+### Schema-driven status codes
+
+The `status_code` in the response comes directly from the schema, not from a hardcoded `200`. If the endpoint's first `2xx` response is `201`, the mock returns `"status_code": 201`. This means create-resource endpoints get the right status code automatically.
+
 Field values are generated with the following priority:
 1. **Enum** — if the schema defines allowed values, one is picked at random (works with inline enums and FastAPI's nullable `anyOf` pattern)
 2. **Custom hints** — team-defined value lists loaded from a YAML file (set `MOCKER_CUSTOM_HINTS_PATH`)
@@ -179,5 +206,6 @@ uv run pytest -k "test_parse_route_returns_route_definition"
 - [x] Phase 5 — Dockerize: multi-stage `Dockerfile` + `.dockerignore` + `make docker-build/run`
 - [x] Phase 6 — Helm + Helmfile: `deploy/` chart (`Deployment`, `Service`, `ConfigMap`, `Ingress`); Helmfile for dev/staging/production overlays; `COMMIT_SHA` flows from Makefile to image tag
 - [x] Phase 7 — Sample-based mocking: `POST /mock/sample` accepts a real response dict and regenerates fake data from its shape; `POST /mock` renamed to `POST /mock/schema`
+- [x] Phase 7.5 — Overrides + schema-driven status codes: optional `overrides` dict echoes caller-provided values back into the response; `status_code` is read from the schema (first `2xx`) instead of hardcoded `200`
 - [ ] Phase 8 — Stub server: mirror all routes from a target service (drop-in replacement mode)
 - [ ] Phase 9 — Service catalog + pre-generated mock store: background worker fetches schemas and pre-generates mock data for registered services into a DB; `app_name + endpoint + method` becomes a DB lookup (replaces static `APP_REGISTRY`); live `schema_url` path remains for ad-hoc use
