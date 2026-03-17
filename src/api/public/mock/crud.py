@@ -52,12 +52,16 @@ def build_mock(request: MockRequest) -> MockResponse:
     logger.info("mock requested", extra={"endpoint": request.endpoint, "method": request.method})
     schema = fetch_schema(schema_url)
     route = parse_route(schema, request.endpoint, request.method)
-    data = generate_mock(route, custom_hints=_resolve_custom_hints(request.app_name))
+    data = generate_mock(
+        route,
+        custom_hints=_resolve_custom_hints(request.app_name),
+        overrides=request.overrides,
+    )
     logger.info("mock generated", extra={"endpoint": request.endpoint, "method": request.method})
 
     return MockResponse(
         data=data,
-        status_code=200,
+        status_code=route.status_code,
         mocked_from=schema_url,
     )
 

@@ -7,3 +7,4 @@ class RouteDefinition(BaseModel):
     path: str
     method: str
     response_schema: dict
+    status_code: int = 200

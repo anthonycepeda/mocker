@@ -12,10 +12,11 @@ def parse_route(schema: dict, path: str, method: str) -> RouteDefinition:
         method: The HTTP method, e.g. "GET". Case-insensitive.
 
     Returns:
-        A RouteDefinition with a fully resolved response_schema.
+        A RouteDefinition with a fully resolved response_schema and the actual status code
+        from the schema (first 2xx response found).
 
     Raises:
-        SchemaParseError: If the path or method is not found, or has no 200 response schema.
+        SchemaParseError: If the path or method is not found, or has no 2xx response schema.
     """
     resolved = resolve_refs(schema)
     method_lower = method.lower()
@@ -28,13 +29,23 @@ def parse_route(schema: dict, path: str, method: str) -> RouteDefinition:
     if method_lower not in route:
         raise SchemaParseError(f"Method '{method.upper()}' not found for path '{path}'")
 
-    try:
-        response_schema = route[method_lower]["responses"]["200"]["content"]["application/json"][
-            "schema"
-        ]
-    except KeyError as e:
-        raise SchemaParseError(
-            f"No 200 JSON response schema found for {method.upper()} {path}: missing key {e}"
-        ) from e
+    responses = route[method_lower]["responses"]
+    status_code = None
+    response_schema = None
+    for code in sorted(str(k) for k in responses.keys()):
+        if code.startswith("2"):
+            try:
+                response_schema = responses[code]["content"]["application/json"]["schema"]
+                status_code = int(code)
+                break
+            except KeyError:
+                continue
 
-    return RouteDefinition(path=path, method=method_lower, response_schema=response_schema)
+    if response_schema is None:
+        raise SchemaParseError(
+            f"No 2xx JSON response schema found for {method.upper()} {path}"
+        )
+
+    return RouteDefinition(
+        path=path, method=method_lower, response_schema=response_schema, status_code=status_code
+    )
