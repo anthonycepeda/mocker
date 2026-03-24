@@ -54,6 +54,26 @@ make helm-destroy ENV=staging  # tear down a release
 |`/healthz`|`GET`|Kubernetes liveness probe — `{}`|
 |`/ready`|`GET`|Kubernetes readiness probe — `{}`|
 
+## Transparent path routing
+
+The fastest way to adopt Mocker: replace only the base URL in your tests. Register your service in `APP_REGISTRY` and swap the host — no other code changes required.
+
+```bash
+# Before
+curl https://myservice.internal/users/abc-123
+
+# After — only the host changes
+curl https://mocker.internal/myservice/users/abc-123
+```
+
+Mocker extracts `myservice` from the first path segment, looks it up in `APP_REGISTRY`, fetches its OpenAPI schema, matches `/users/abc-123` to the closest path template (e.g. `/users/{id}`), and returns a schema-valid mock response with the correct status code.
+
+All HTTP methods are supported (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Path parameters with real values (e.g. `/users/abc-123`) are automatically matched to their schema templates (e.g. `/users/{id}`).
+
+An unknown `app_name` returns HTTP 422 with a structured error.
+
+---
+
 ## Usage
 
 Use `schema_url` to point at any OpenAPI schema, or `app_name` for a registered well-known service. If both are given, `schema_url` wins.
@@ -207,5 +227,5 @@ uv run pytest -k "test_parse_route_returns_route_definition"
 - [x] Phase 6 — Helm + Helmfile: `deploy/` chart (`Deployment`, `Service`, `ConfigMap`, `Ingress`); Helmfile for dev/staging/production overlays; `COMMIT_SHA` flows from Makefile to image tag
 - [x] Phase 7 — Sample-based mocking: `POST /mock/sample` accepts a real response dict and regenerates fake data from its shape; `POST /mock` renamed to `POST /mock/schema`
 - [x] Phase 7.5 — Overrides + schema-driven status codes: optional `overrides` dict echoes caller-provided values back into the response; `status_code` is read from the schema (first `2xx`) instead of hardcoded `200`
-- [ ] Phase 8 — Stub server: mirror all routes from a target service (drop-in replacement mode)
+- [x] Phase 8 — Transparent path routing: `GET /myservice/users/123` → mock without changing test code beyond the base URL
 - [ ] Phase 9 — Service catalog + pre-generated mock store: background worker fetches schemas and pre-generates mock data for registered services into a DB; `app_name + endpoint + method` becomes a DB lookup (replaces static `APP_REGISTRY`); live `schema_url` path remains for ad-hoc use

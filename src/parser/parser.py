@@ -1,6 +1,33 @@
+import re
+
 from src.parser.models import RouteDefinition
 from src.parser.resolver import resolve_refs
 from src.utils.exceptions import SchemaParseError
+
+
+def _resolve_path_template(schema_paths: dict, path: str) -> str:
+    """Return the schema path template that matches the given concrete path.
+
+    Tries an exact match first, then falls back to matching path parameter
+    templates (e.g. ``/services/{id}`` matches ``/services/abc-123``).
+
+    Args:
+        schema_paths: The ``paths`` dict from the resolved OpenAPI schema.
+        path: The incoming path, either a template or a concrete path with real values.
+
+    Returns:
+        The matching schema path template string.
+
+    Raises:
+        SchemaParseError: If no template matches the incoming path.
+    """
+    if path in schema_paths:
+        return path
+    for template in schema_paths:
+        pattern = re.sub(r"\{[^}]+\}", r"[^/]+", template)
+        if re.fullmatch(pattern, path):
+            return template
+    raise SchemaParseError(f"Path '{path}' not found in schema")
 
 
 def parse_route(schema: dict, path: str, method: str) -> RouteDefinition:
@@ -22,10 +49,8 @@ def parse_route(schema: dict, path: str, method: str) -> RouteDefinition:
     method_lower = method.lower()
 
     paths = resolved.get("paths", {})
-    if path not in paths:
-        raise SchemaParseError(f"Path '{path}' not found in schema")
-
-    route = paths[path]
+    matched_path = _resolve_path_template(paths, path)
+    route = paths[matched_path]
     if method_lower not in route:
         raise SchemaParseError(f"Method '{method.upper()}' not found for path '{path}'")
 
