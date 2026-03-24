@@ -68,9 +68,11 @@ curl https://mocker.internal/myservice/users/abc-123
 
 Mocker extracts `myservice` from the first path segment, looks it up in `APP_REGISTRY`, fetches its OpenAPI schema, matches `/users/abc-123` to the closest path template (e.g. `/users/{id}`), and returns a schema-valid mock response with the correct status code.
 
-All HTTP methods are supported (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Path parameters with real values (e.g. `/users/abc-123`) are automatically matched to their schema templates (e.g. `/users/{id}`).
+All HTTP methods are supported (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Path parameters with real values (e.g. `/users/abc-123`) are automatically matched to their schema templates (e.g. `/users/{id}`). Query strings are stripped before matching, so `/referential?sub_id=abc` resolves to the `/referential` schema path.
 
 An unknown `app_name` returns HTTP 422 with a structured error.
+
+> The transparent route is not exposed in Swagger UI — use curl, httpx, or your test code directly. For interactive exploration, use `POST /mock/schema` instead.
 
 ---
 
