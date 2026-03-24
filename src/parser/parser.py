@@ -24,7 +24,8 @@ def _resolve_path_template(schema_paths: dict, path: str) -> str:
     if path in schema_paths:
         return path
     for template in schema_paths:
-        pattern = re.sub(r"\{[^}]+\}", r"[^/]+", template)
+        parts = re.split(r"\{[^}]+\}", template)
+        pattern = r"[^/]+".join(re.escape(p) for p in parts)
         if re.fullmatch(pattern, path):
             return template
     raise SchemaParseError(f"Path '{path}' not found in schema")
@@ -49,7 +50,7 @@ def parse_route(schema: dict, path: str, method: str) -> RouteDefinition:
     method_lower = method.lower()
 
     paths = resolved.get("paths", {})
-    matched_path = _resolve_path_template(paths, path)
+    matched_path = _resolve_path_template(paths, path.split("?")[0])
     route = paths[matched_path]
     if method_lower not in route:
         raise SchemaParseError(f"Method '{method.upper()}' not found for path '{path}'")
@@ -67,9 +68,7 @@ def parse_route(schema: dict, path: str, method: str) -> RouteDefinition:
                 continue
 
     if response_schema is None:
-        raise SchemaParseError(
-            f"No 2xx JSON response schema found for {method.upper()} {path}"
-        )
+        raise SchemaParseError(f"No 2xx JSON response schema found for {method.upper()} {path}")
 
     return RouteDefinition(
         path=path, method=method_lower, response_schema=response_schema, status_code=status_code

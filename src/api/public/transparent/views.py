@@ -5,12 +5,13 @@ from src.api.public.mock.crud import build_mock
 from src.api.public.mock.models import MockRequest
 from src.utils.exceptions import SchemaFetchError, SchemaParseError
 
-router = APIRouter(tags=["Transparent"])
+router = APIRouter()
 
 
 @router.api_route(
     "/{app_name}/{path:path}",
     methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+    include_in_schema=False,
 )
 def transparent_mock(app_name: str, path: str, request: Request) -> JSONResponse:
     """Mock any registered service by replacing the base URL with Mocker's base URL.
