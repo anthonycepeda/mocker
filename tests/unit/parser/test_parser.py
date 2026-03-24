@@ -1,7 +1,7 @@
 import pytest
 
 from src.parser.models import RouteDefinition
-from src.parser.parser import parse_route
+from src.parser.parser import _resolve_path_template, parse_route
 from src.utils.exceptions import SchemaParseError
 
 
@@ -115,3 +115,33 @@ def test_parse_route_raises_when_no_2xx():
     }
     with pytest.raises(SchemaParseError, match="No 2xx"):
         parse_route(schema, "/users", "POST")
+
+
+def test_parse_route_matches_concrete_path_to_template(simple_schema):
+    """Concrete path /services/abc-123 resolves to template /services/{id}."""
+    result = parse_route(simple_schema, "/services/abc-123", "GET")
+    assert isinstance(result, RouteDefinition)
+
+
+def test_resolve_path_template_exact_match():
+    paths = {"/services/{id}": {}, "/users": {}}
+    assert _resolve_path_template(paths, "/services/{id}") == "/services/{id}"
+
+
+def test_resolve_path_template_concrete_path():
+    paths = {"/services/{id}": {}}
+    assert _resolve_path_template(paths, "/services/abc-123") == "/services/{id}"
+
+
+def test_resolve_path_template_multi_segment():
+    paths = {"/orgs/{org_id}/users/{user_id}": {}}
+    assert (
+        _resolve_path_template(paths, "/orgs/42/users/99")
+        == "/orgs/{org_id}/users/{user_id}"
+    )
+
+
+def test_resolve_path_template_raises_on_no_match():
+    paths = {"/services/{id}": {}}
+    with pytest.raises(SchemaParseError, match="Path '/unknown'"):
+        _resolve_path_template(paths, "/unknown")
